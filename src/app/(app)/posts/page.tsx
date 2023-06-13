@@ -1,6 +1,7 @@
 import { distanceToNow } from '@/lib/date-relative';
 import { Post } from '@prisma/client';
 import { absoluteUrl } from '@/lib/utils';
+import Link from 'next/link';
 
 export default async function Page() {
   const posts = await getAllPosts();
@@ -12,9 +13,12 @@ export default async function Page() {
           posts.map((post) => {
             return (
               <article key={post.id}>
-                <span className={'text-lg leading-6 font-bold'}>
+                <Link
+                  href={`/posts/${post.id}`}
+                  className={'text-lg leading-6 font-bold'}
+                >
                   {post.title}
-                </span>
+                </Link>
                 <p>{post.excerpt}</p>
                 <time
                   className={'text-gray-400'}
