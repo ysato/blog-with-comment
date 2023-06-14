@@ -45,6 +45,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  comments      Comment[]
 }
 
 model VerificationToken {
@@ -56,9 +57,20 @@ model VerificationToken {
 }
 
 model Post {
-  id      String   @id @default(uuid())
-  title   String
-  date    DateTime @default(now())
+  id       String    @id @default(uuid())
+  title    String
+  date     DateTime  @default(now())
+  content  String
+  excerpt  String
+  comments Comment[]
+}
+
+model Comment {
+  id      Int      @id @default(autoincrement())
   content String
-  excerpt String
+  date    DateTime @default(now())
+  postId  String
+  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String
 }
