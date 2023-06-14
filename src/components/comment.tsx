@@ -4,7 +4,7 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import React, { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function Comment() {
+export default function Comment({ postId }: { postId: string }) {
   const session = useSession();
   const ref = useRef<HTMLFormElement>(null);
   const router = useRouter();
@@ -13,6 +13,17 @@ export default function Comment() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    const form = new FormData(event.currentTarget);
+
+    const res = await fetch(`/api/posts/${postId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ content: form.get('content') }),
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to post comment');
+    }
 
     ref.current?.reset();
 

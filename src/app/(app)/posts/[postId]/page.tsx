@@ -29,7 +29,7 @@ export default async function Page({
           <div className={'prose'} dangerouslySetInnerHTML={{ __html: html }} />
         </article>
         <div className={'flex flex-col gap-10'}>
-          <Comment />
+          <Comment postId={postId} />
         </div>
       </div>
     </main>
