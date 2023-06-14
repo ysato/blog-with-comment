@@ -4,6 +4,7 @@ import html from 'remark-html';
 import { Post } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { absoluteUrl } from '@/lib/utils';
+import Comment from '@/components/comment';
 
 export default async function Page({
   params: { postId },
@@ -11,6 +12,7 @@ export default async function Page({
   params: { postId: string };
 }) {
   const post = await getPost(postId);
+
   const html = await markdownToHtml(post.content);
 
   return (
@@ -26,6 +28,9 @@ export default async function Page({
           </header>
           <div className={'prose'} dangerouslySetInnerHTML={{ __html: html }} />
         </article>
+        <div className={'flex flex-col gap-10'}>
+          <Comment />
+        </div>
       </div>
     </main>
   );
