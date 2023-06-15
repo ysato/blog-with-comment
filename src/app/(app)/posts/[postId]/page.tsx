@@ -1,18 +1,22 @@
 import { distanceToNow } from '@/lib/date-relative';
 import { remark } from 'remark';
 import html from 'remark-html';
-import { Post } from '@prisma/client';
+import { Comment, Post, User } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import { absoluteUrl } from '@/lib/utils';
-import Comment from '@/components/comment';
+import PostCommentList from '@/components/post-comment-list';
+import React, { Suspense } from 'react';
+import PostCommentForm from '@/components/post-comment-form';
 
 export default async function Page({
   params: { postId },
 }: {
   params: { postId: string };
 }) {
-  const post = await getPost(postId);
+  const postData = getPost(postId);
+  const commentData = getComments(postId);
 
+  const post = await postData;
   const html = await markdownToHtml(post.content);
 
   return (
@@ -29,7 +33,10 @@ export default async function Page({
           <div className={'prose'} dangerouslySetInnerHTML={{ __html: html }} />
         </article>
         <div className={'flex flex-col gap-10'}>
-          <Comment postId={postId} />
+          <PostCommentForm postId={postId} />
+          <Suspense>
+            <PostCommentList promise={commentData} />
+          </Suspense>
         </div>
       </div>
     </main>
@@ -52,6 +59,20 @@ async function getPost(postId: string) {
   const { data } = await res.json();
 
   return data as Post;
+}
+
+async function getComments(postId: string) {
+  const res = await fetch(absoluteUrl(`/api/posts/${postId}/comments`), {
+    cache: 'no-store',
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch comments');
+  }
+
+  const { data } = await res.json();
+
+  return data as (Comment & { user: User })[];
 }
 
 async function markdownToHtml(markdown: string) {

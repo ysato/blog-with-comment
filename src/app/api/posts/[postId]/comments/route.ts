@@ -3,6 +3,21 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
+export async function GET(
+  request: Request,
+  { params }: { params: { postId: string } },
+) {
+  const data = await prisma.comment.findMany({
+    where: { postId: params.postId },
+    include: { user: true },
+    orderBy: { date: 'desc' },
+  });
+
+  return NextResponse.json({ data });
+}
+
 export async function POST(
   request: Request,
   { params }: { params: { postId: string } },
